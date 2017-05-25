@@ -21,7 +21,7 @@ var baseConfig = {
         "index": [
             isProduction ? 
             path.join(configWebpack.path.src, "index.js")
-            : path.join(configWebpack.path.example, "src/index.js")
+            : path.join(configWebpack.path.example, "src/container/index.js")
         ],
     },
     output: {
