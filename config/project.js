@@ -74,7 +74,7 @@ var config = {
         },
 
         alias: {
-            
+            // 'index': path.join(srcPath, "index"),
         },
 
         // ========================= webpack entry配置 =========================

@@ -12,17 +12,10 @@ var config = require('../config/project'),
     env = process.env.NODE_ENV,
     isProduction = env === 'production';
 
-var Clean = require('clean-webpack-plugin'),
-    NpmInstallPlugin  = require('npm-install-webpack-plugin-steamer');
+var Clean = require('clean-webpack-plugin');
 
 var baseConfig = {
-    entry: {
-        "index": [
-            isProduction ? 
-            path.join(configWebpack.path.src, "index.js")
-            : path.join(configWebpack.path.example, "src/container/index.js")
-        ],
-    },
+    entry: configWebpack.entry,
     output: {
         path: isProduction ? configWebpack.path.dist : path.join(configWebpack.path.example, "dev"),
         filename: "[name].js",
