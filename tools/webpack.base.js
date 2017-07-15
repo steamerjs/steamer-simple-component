@@ -13,8 +13,7 @@ var config = require('../config/project'),
     isProduction = env === 'production';
 
 var Clean = require('clean-webpack-plugin'),
-    NpmInstallPlugin  = require('npm-install-webpack-plugin-steamer'),
-    StylelintWebpackPlugin = require('stylelint-webpack-plugin');
+    NpmInstallPlugin  = require('npm-install-webpack-plugin-steamer');
 
 var baseConfig = {
     entry: {
@@ -31,12 +30,6 @@ var baseConfig = {
     },
     module: {
         rules: [
-            {
-                test: /\.js$/,
-                loader: 'eslint-loader',
-                enforce: "pre",
-                include: configWebpack.path.src
-            },
             { 
                 test: /\.js$/,
                 loader: 'babel-loader',
@@ -59,22 +52,6 @@ var baseConfig = {
         // remove previous build folder
         new Clean([isProduction ? configWebpack.path.dist : path.join(configWebpack.path.example, "dev")], {root: path.resolve()}),
         new webpack.NoEmitOnErrorsPlugin(),
-        new StylelintWebpackPlugin({
-            configFile: path.resolve(__dirname, '../.stylelintrc.js'),
-            context: 'inherits from webpack',
-            files: '../src/**/*.@(?(s)?(a|c)ss|less|html|vue)',
-            failOnError: false,
-            lintDirtyModulesOnly: true,                 // 只在改变的时候lint，其他时候跳过
-            extractStyleTagsFromHtml: true,
-        }),
-        new NpmInstallPlugin({
-            // Use --save or --save-dev
-            dev: true,
-            // Install missing peerDependencies
-            peerDependencies: true,
-            // Reduce amount of console logging
-            quiet: false,
-        })
     ],
     watch: !isProduction,
 };
@@ -218,6 +195,14 @@ var templateRules = {
     }
 };
 
+// js方言
+var jsRules = {
+    ts: {
+        test: /\.(tsx|ts)$/,
+        loader: 'awesome-typescript-loader'
+    }
+};
+
 configWebpack.style.forEach((style) => {
     style = (style === 'scss') ? 'sass' : style;
     let rule = styleRules[style] || '';
@@ -226,6 +211,11 @@ configWebpack.style.forEach((style) => {
 
 configWebpack.template.forEach((tpl) => {
     let rule = templateRules[tpl] || '';
+    rule && baseConfig.module.rules.push(rule);
+});
+
+configWebpack.js.forEach((tpl) => {
+    let rule = jsRules[tpl] || '';
     rule && baseConfig.module.rules.push(rule);
 });
 
