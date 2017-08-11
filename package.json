@@ -1,17 +1,16 @@
 {
   "name": "steamer-simple-component",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.2",
   "description": "simple component development starter kit",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node ./tools/script.js --mode=development",
-    "dev": "node ./tools/script.js --mode=development",
-    "source": "node ./tools/script.js --mode=source",
+    "start": "cross-env NODE_ENV=development node ./tools/script.js",
+    "dev": "npm run start",
     "dist": "npm run babel",
     "test": "npm run karma",
     "babel": "babel src --out-dir dist --copy-files",
-    "webpack": "node ./tools/script.js --mode=production",
-    "karma": "cross-env BABEL_ENV=test node ./tools/script.js --mode=karma",
+    "webpack": "cross-env NODE_ENV=production node ./tools/script.js",
+    "karma": "cross-env BABEL_ENV=test NODE_ENV=production KARMA_ENV=karma node ./tools/script.js",
     "lint": "eslint src/**/*.js && stylelint src/**/*.less",
     "lint:js": "eslint src/**/*.js",
     "lint:style": "stylelint src/**/*.less"
