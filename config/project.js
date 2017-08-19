@@ -15,7 +15,32 @@ var srcPath = path.resolve(__basename, "src"),
     examplePath = path.resolve(__basename, "example"),
     testPath = path.resolve(__basename, "test");
 
-var HtmlResWebpackPlugin = require('html-res-webpack-plugin');
+var entry = {};
+
+
+if (isProduction) {
+    entry = {
+        index: path.join(srcPath, 'index.js')
+    };
+}
+else {
+    // 根据约定，自动扫描js entry，约定是example/src/page/xxx/main.js 或 example/src/page/xxx/main.jsx
+    /** 
+        获取结果示例
+        {
+            'js/index': [path.join(configWebpack.path.src, "/page/index/main.js")],
+            'js/spa': [path.join(configWebpack.path.src, "/page/spa/main.js")],
+            'js/pindex': [path.join(configWebpack.path.src, "/page/pindex/main.jsx")],
+        }
+     */
+    entry = utils.filterJsFileByCmd(utils.getJsEntry({
+        srcPath: path.join(examplePath, "src/page"), 
+        fileName: "main",
+        extensions: ["js", "jsx"],
+        keyPrefix: "",
+        level: 1
+    }));
+}
 
 // ========================= webpack快捷配置 =========================
 // 基本情况下，你只需要关注这里的配置
@@ -41,18 +66,20 @@ var config = {
         // ========================= webpack服务器及路由配置 =========================
         // 开发服务器配置
         webserver: steamerConfig.webserver,
-        cdn: steamerConfig.cdn,
         port: steamerConfig.port,    // port for local server
-        route: steamerConfig.route, // http://host/news/
+        route: [], // proxy route, 例如: /news/
 
         // ========================= webpack自定义配置 =========================
         // 是否显示开发环境下的生成文件
         showSource: true,
-
+        
         // 是否清理生成文件夹
         clean: true,
 
-        // javascript 方言，目前仅支持 ts(typescript)
+        // 是否压缩
+        compress: false,
+
+        // javascript 方言, 目前仅支持 ts(typescript)
         js: [],
 
         // 预编译器，默认支持css 和 less. sass, scss 和 stylus 由npm-install-webpack-plugin自动安装
@@ -77,26 +104,11 @@ var config = {
         },
 
         alias: {
-            // 'index': path.join(srcPath, "index"),
+            
         },
 
         // ========================= webpack entry配置 =========================
-        // 根据约定，自动扫描js entry，约定是src/page/xxx/main.js 或 src/page/xxx/main.jsx
-        /** 
-            获取结果示例
-            {
-                'js/index': [path.join(configWebpack.path.src, "/page/index/main.js")],
-                'js/spa': [path.join(configWebpack.path.src, "/page/spa/main.js")],
-                'js/pindex': [path.join(configWebpack.path.src, "/page/pindex/main.jsx")],
-            }
-         */
-        entry: utils.filterJsFileByCmd(utils.getJsEntry({
-            srcPath: path.join(examplePath, "src/page"), 
-            fileName: "main",
-            extensions: ["js", "jsx"],
-            keyPrefix: "",
-            level: 1
-        })),
+        entry: entry,
 
         // 自动扫描html，配合html-res-webpack-plugin
         /**
@@ -136,7 +148,7 @@ config.custom = {
         if (isProduction) {
             return {
                 library: "lib",
-                libraryTarget: "umd",
+                libraryTarget: "commonjs2",
             };
         }
         else {
@@ -164,21 +176,6 @@ config.custom = {
     // webpack plugins
     getPlugins: function() {
         var plugins = [];
-
-        if (!isProduction) {
-            config.webpack.html.forEach(function(page, key) {
-                plugins.push(new HtmlResWebpackPlugin({
-                    mode: "html",
-                    filename: page.key + ".html",
-                    template: page.path,
-                    htmlMinify: null,
-                    entryLog: true,
-                    templateContent: function(tpl) {
-                        return tpl;
-                    }
-                }));
-            }); 
-        }
         
         return plugins;
     },
@@ -198,7 +195,7 @@ config.custom = {
 config.webpackMerge = {
     // webpack-merge smartStrategy 配置
     smartStrategyOption: {
-        "module.rules": "prepend",
+        "module.rules": "append",
         "plugins": "append"
     },
 
