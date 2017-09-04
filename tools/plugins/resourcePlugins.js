@@ -60,7 +60,7 @@ module.exports = function(config, webpack) {
 
 	if (configWebpack.clean) {
         // 生产环境，只删除一次
-	    plugins.push(new Clean([isProduction ? configWebpack.path.dist : path.join(configWebpack.path.example, 'dev')], {root: path.resolve()}),);
+	    plugins.push(new Clean([isProduction ? configWebpack.path.dist : path.join(configWebpack.path.example, 'dev')], {root: path.resolve()}));
 	}
 
 	return plugins;
