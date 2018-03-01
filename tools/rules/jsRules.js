@@ -4,6 +4,7 @@ const path = require('path');
 
 module.exports = function(config) {
 
+    var isProduction = config.env === 'production';
 	var configWebpack = config.webpack;
 
 	// js方言
@@ -15,8 +16,11 @@ module.exports = function(config) {
             loader: 'happypack/loader?id=1',
             exclude: /node_modules/
 		},
-		// 为了统计代码覆盖率，对 js 文件加入 istanbul-instrumenter-loader
-        {
+    ];
+
+    if (!isProduction) {
+        // 为了统计代码覆盖率，对 js 文件加入 istanbul-instrumenter-loader
+        rules.push({
             test: /\.(js)$/,
             loader: 'istanbul-instrumenter-loader',
             exclude: /node_modules/,
@@ -25,8 +29,8 @@ module.exports = function(config) {
             options: {
                 esModules: true
             }
-        },
-	];
+        });
+    }
 
 	configWebpack.js.forEach((tpl) => {
 	    let rule = jsRules[tpl] || '';
