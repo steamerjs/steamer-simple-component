@@ -144,7 +144,7 @@ var config = {
 config.custom = {
     // webpack output
     getOutput: function() {
-        
+
         if (isProduction) {
             return {
                 library: "lib",
